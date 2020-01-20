@@ -390,7 +390,7 @@ class Client
             $data = $this->getCommonTable($response->getBody());
         }else{
             $viewstate = $this->getExamViewState($response->getBody());
-            $response = $this->post("https://vpn.bjut.edu.cn/prx/000/http/gdjwgl.bjut.edu.cn/xskscx.aspx?xh=19071125&xm=%C2%AC%D3%EA%D0%F9&gnmkdm=N121604", [], [
+            $response = $this->post(self::ZF_EXAM_URI, [], [
                 '__EVENTTARGET' => "xqd",
                 '__EVENTARGUMENT' => "",
                 '__VIEWSTATE' => $viewstate,
@@ -398,7 +398,7 @@ class Client
                 'xqd' => 4-(int)$term,
             ], $this->headers);
             $viewstate = $this->getExamViewState($response->getBody());
-            $response = $this->post("https://vpn.bjut.edu.cn/prx/000/http/gdjwgl.bjut.edu.cn/xskscx.aspx?xh=19071125&xm=%C2%AC%D3%EA%D0%F9&gnmkdm=N121604", [], [
+            $response = $this->post(self::ZF_EXAM_URI, [], [
                 '__EVENTTARGET' => "xqd",
                 '__EVENTARGUMENT' => "",
                 '__VIEWSTATE' => $viewstate,

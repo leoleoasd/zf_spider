@@ -4,8 +4,8 @@
  * This is a lib to crawl the Academic Network Systems.
  * You can achieve easely the querying of grade/schedule/cet/free classroom ...
  *
- * @author Ning Luo <luoning@Luoning.me>
- * @link https://github.com/lndj/Lcrawl
+ * @author Leo Lu <i@leoleoasd.me>
+ * @link https://github.com/leoleoasd/zf_spider
  * @license  MIT
  */
 
