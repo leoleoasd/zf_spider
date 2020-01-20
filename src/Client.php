@@ -77,6 +77,10 @@ class Client
         throw new SpiderException("VPN登录失败!");
     }
 
+    /**
+     * Test if vpn is logged in.
+     * @return bool
+     */
     public function test_vpn(){
         $result = $this->client->get($this->vpn_url.'welcome', [
             'allow_redirects' => false,
@@ -261,6 +265,7 @@ class Client
      *
      * @param void
      * @return $this or $jar
+     * @throws SpiderException
      */
     public function login()
     {
@@ -286,12 +291,7 @@ class Client
             'cookies' => $this->cookie,
             'allow_redirects' => false,
         ];
-        try {
-            $result = $this->client->request('POST', $this->login_uri, $query);
-        }catch (SpiderException $e){
-            dump($e);
-            die();
-        }
+        $result = $this->client->request('POST', $this->login_uri, $query);
         $response = $this->client->get($this->main_page_uri, [
             'allow_redirects' => false, 'query' => ['xh' => $this->stu_id],
             'cookies' => $this->cookie,
@@ -355,14 +355,9 @@ class Client
      */
     public function getSchedule($year = null, $term = null)
     {
-        /**
-         * Default: get the current term schedule data by GET
-         * If you want to get the other term's data, use POST
-         * TODO: use POST to get other term's data
-         */
         $response = $this->get(self::ZF_SCHEDULE_URI, [], $this->headers);
         if($term == null or $year == null){
-            return (array)$this->getSchedule($response->getBody());
+            return $this->getScheduleTable($response->getBody());
         }else{
             $viewstate = $this->getScheduleViewState($response->getBody());
             $response = $this->post(self::ZF_SCHEDULE_URI, [], [
@@ -394,7 +389,6 @@ class Client
         if($term == null or $year == null){
             $data = $this->getCommonTable($response->getBody());
         }else{
-            dump((string)$response->getBody());
             $viewstate = $this->getExamViewState($response->getBody());
             $response = $this->post("https://vpn.bjut.edu.cn/prx/000/http/gdjwgl.bjut.edu.cn/xskscx.aspx?xh=19071125&xm=%C2%AC%D3%EA%D0%F9&gnmkdm=N121604", [], [
                 '__EVENTTARGET' => "xqd",

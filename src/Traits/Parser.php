@@ -24,7 +24,7 @@ trait  Parser
      * @param Object $body
      * @return array
      */
-    public function getSchedule($body)
+    public function getScheduleTable($body)
     {
         $crawler = new Crawler((string)$body);
         $crawler = $crawler->filter('#Table1');

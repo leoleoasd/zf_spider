@@ -23,11 +23,11 @@ trait BuildRequest
     /**
      * Build the get request.
      *
-     * @param type|string $uri
-     * @param type|array $param
-     * @param type|array $headers
-     * @param type|bool $isAsync
-     * @return type
+     * @param string $uri
+     * @param array $param
+     * @param array $headers
+     * @param bool $isAsync
+     * @return mixed
      */
     public function get($uri, $param = [], $headers = [], $isAsync = false)
     {
@@ -65,7 +65,8 @@ trait BuildRequest
             [
                 'query' => $query_param,
                 'headers' => $headers,
-                'cookies' => $this->cookie
+                'cookies' => $this->cookie,
+                'form_params' => $param,
             ]
         );
         //If use getAll(), use the Async request.
