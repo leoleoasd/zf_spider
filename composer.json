@@ -1,0 +1,21 @@
+{
+    "name": "leoleoasd/zf_spider",
+    "type": "library",
+    "description": "一只优雅的正方教务系统爬虫。",
+    "keywords": ["正方","模拟登陆","教务系统"],
+    "license": "MIT",
+    "authors": [
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "guzzlehttp/guzzle": "~6.0",
+        "symfony/dom-crawler": "^3.0",
+        "symfony/css-selector": "^3.0",
+        "doctrine/cache": "^1.6"
+    },
+    "autoload": {
+    	"psr-4": {
+            "ZfSpider\\": "src/"
+        }
+    }
+}
