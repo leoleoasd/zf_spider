@@ -161,63 +161,16 @@ trait Parser
      * Parser the hidden value of HTML form.
      *
      * @param Object|string $body
-     * @return string|null
+     * @return string[]|null
      */
-    public function getViewState($body)
+    public function getCourseSelectViewState($body)
     {
         $crawler = new Crawler((string)$body);
-        return $crawler->filterXPath('//*[@id="form1"]/input')->attr('value');
-    }
-
-    /**
-     * When get Grade info, the hidden value is not same as login page.
-     *
-     * @param Object|string $body
-     * @return string|null
-     */
-    public function getGradeViewState($body)
-    {
-        try {
-            $crawler = new Crawler((string)$body);
-            return $crawler->filterXPath('//*[@id="Form1"]/input')->attr('value');
-        } catch (Exception $e) {
-            return null;
-        }
-    }
-
-    /**
-     * Parser the hidden value of HTML form.
-     *
-     * @param Object|string $body
-     * @return string|null
-     */
-    public function getScheduleViewState($body)
-    {
-        $crawler = new Crawler((string)$body);
-        return $crawler->filterXPath('//*[@id="xskb_form"]/input[3]')->attr('value');
-    }
-
-    /**
-     * Parser the hidden value of HTML form.
-     *
-     * @param Object|string $body
-     * @return string|null
-     */
-    public function getExamViewState($body)
-    {
-        $crawler = new Crawler((string)$body);
-        return $crawler->filterXPath('//*[@id="form1"]/input[3]')->attr('value');
-    }
-
-    /**
-     * Get the "action" when dealing with schedule.
-     *
-     * @param $body
-     * @return string|null
-     */
-    public function getAction($body){
-        $crawler = new Crawler((string)$body);
-        return $crawler->filterXPath('//*[@id="xskb_form"]')->attr('action');
+        return [
+            $crawler->filterXPath('//*[@id="Form1"]/input[3]')->attr('value'),
+            $crawler->filterXPath('//select[@name="ddlXN"]/option[@selected="selected"]')->attr('value'),
+            $crawler->filterXPath('//select[@name="ddlXQ"]/option[@selected="selected"]')->attr('value'),
+        ];
     }
 
     public function detailData(string $body){

@@ -51,6 +51,8 @@ class Client
 
     private $vpn_url;
 
+    private $responses = [];
+
     /**
      * @param string $username
      * @param string $password
@@ -271,12 +273,41 @@ class Client
     /**
      * Get the course select result.
      *
-     * @return array
+     * @param string $year
+     * @param string $term
+     * @return stdClass
      */
-    public function getCourseSelect()
+    public function getCourseSelect($year = '', $term = '')
     {
-        $response = $this->get(self::ZF_SELECT_URI);
-        return $this->courseSelectData($response->getBody());
+        if ( isset($this->responses['course_select']) ) {
+            $response = $this->responses['course_select'];
+        } else {
+            $response = $this->get(self::ZF_SELECT_URI);
+            $this->responses['course_select'] = $response;
+        }
+
+        $viewState = $this->getCourseSelectViewState($response->getBody());
+        $ret = new stdClass();
+        $ret->year = $viewState[1];
+        $ret->term = $viewState[2];
+        if ($year == '' || ($ret->year == $year && $ret->term == $term) ) {
+            $ret->list = $this->courseSelectData($response->getBody());
+            return $ret;
+        } else if ($term == '') {
+            return null;
+        }
+
+        $response = $this->post(self::ZF_SELECT_URI, [], [
+            '__VIEWSTATE' => $viewState[0],
+            '__EVENTTARGET' => 'ddlXQ',
+            'ddlXN' => $year,
+            'ddlXQ' => $term,
+        ]);
+        $viewState = $this->getCourseSelectViewState($response->getBody());
+        $ret->year = $viewState[1];
+        $ret->term = $viewState[2];
+        $ret->list = $this->courseSelectData($response->getBody());
+        return $ret;
     }
 
     /**
