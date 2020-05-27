@@ -165,12 +165,16 @@ trait Parser
      */
     public function getCourseSelectViewState($body)
     {
-        $crawler = new Crawler((string)$body);
-        return [
-            $crawler->filterXPath('//*[@id="Form1"]/input[3]')->attr('value'),
-            $crawler->filterXPath('//select[@name="ddlXN"]/option[@selected="selected"]')->attr('value'),
-            $crawler->filterXPath('//select[@name="ddlXQ"]/option[@selected="selected"]')->attr('value'),
-        ];
+        try {
+            $crawler = new Crawler((string)$body);
+            return [
+                $crawler->filterXPath('//*[@id="Form1"]/input[3]')->attr('value'),
+                $crawler->filterXPath('//select[@name="ddlXN"]/option[@selected="selected"]')->attr('value'),
+                $crawler->filterXPath('//select[@name="ddlXQ"]/option[@selected="selected"]')->attr('value'),
+            ];
+        } catch (Exception $e) {
+            return null;
+        }
     }
 
     public function detailData(string $body){

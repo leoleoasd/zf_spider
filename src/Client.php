@@ -36,9 +36,10 @@ class Client
 
     private $main_page_uri = 'xs_main.aspx';
 
-    private $stu_id;
-
+    protected $stu_id;
     private $password;
+    protected $logged_in = false;
+    protected $logged_in_vpn = false;
 
     private $cache; //Doctrine\Common\Cache\Cache
 
@@ -75,6 +76,7 @@ class Client
         ];
         $result = $this->client->request('POST', $this->vpn_url.'login', $query);
         if($result->getStatusCode() == 302 and $result->getHeader("Location") == ['https://vpn.bjut.edu.cn/prx/000/http/localhost/welcome']) {
+            $this->logged_in_vpn = true;
             return $this->cookie;
         }
         throw new SpiderException("VPN登录失败!");
@@ -90,8 +92,10 @@ class Client
             'cookies' => $this->cookie
         ]);
         if( $result->getStatusCode() == 200 ) {
+            $this->logged_in_vpn = true;
             return true;
         } else {
+            $this->logged_in_vpn = false;
             return false;
         }
     }
@@ -141,6 +145,22 @@ class Client
     }
 
     /**
+     * @return bool
+     */
+    public function isLoggedIn(): bool
+    {
+        return $this->logged_in;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLoggedInVpn(): bool
+    {
+        return $this->logged_in_vpn;
+    }
+
+    /**
      * Login, and get the cookie jar.
      *
      * @param void
@@ -186,6 +206,7 @@ class Client
                 throw new SpiderException('Maybe the data source is broken!', 1001);
                 break;
         }
+        $this->logged_in = true;
         return $this->cookie;
     }
 
@@ -285,8 +306,15 @@ class Client
             $response = $this->get(self::ZF_SELECT_URI);
             $this->responses['course_select'] = $response;
         }
+        if ( is_null($response) ) {
+            return null;
+        }
 
         $viewState = $this->getCourseSelectViewState($response->getBody());
+        if ( is_null($viewState) ) {
+            return null;
+        }
+
         $ret = new stdClass();
         $ret->year = $viewState[1];
         $ret->term = $viewState[2];
