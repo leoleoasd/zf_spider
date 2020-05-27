@@ -37,7 +37,7 @@ class Client
     private $main_page_uri = 'xs_main.aspx';
 
     protected $stu_id;
-    private $password;
+    protected $password;
     protected $logged_in = false;
     protected $logged_in_vpn = false;
 
@@ -64,10 +64,10 @@ class Client
         $post=[
             'uname'=>$username,
             'pwd'=>$password,
-            'method'=>"",
+            'method'=>'',
             'pwd1'=>$password,
-            'pwd2'=>"",
-            'submitbutton'=>urldecode("%E7%99%BB%E5%BD%95"),
+            'pwd2'=>'',
+            'submitbutton'=>urldecode('%E7%99%BB%E5%BD%95'),
         ];
         $query = [
             'form_params' => $post,
@@ -75,11 +75,11 @@ class Client
             'allow_redirects' => false
         ];
         $result = $this->client->request('POST', $this->vpn_url.'login', $query);
-        if($result->getStatusCode() == 302 and $result->getHeader("Location") == ['https://vpn.bjut.edu.cn/prx/000/http/localhost/welcome']) {
+        if($result->getStatusCode() == 302 and $result->getHeader('Location') == ['https://vpn.bjut.edu.cn/prx/000/http/localhost/welcome']) {
             $this->logged_in_vpn = true;
             return $this->cookie;
         }
-        throw new SpiderException("VPN登录失败!");
+        throw new SpiderException( 'VPN登录失败!', 1010 );
     }
 
     /**
@@ -108,7 +108,7 @@ class Client
      * @param string $base_url
      * @param array $request_options
      */
-    function __construct($user, $loginParam = [], $vpn_url = "https://vpn.bjut.edu.cn/prx/000/http/localhost/", $base_url = "https://vpn.bjut.edu.cn/prx/000/http/gdjwgl.bjut.edu.cn/", $request_options = [])
+    function __construct($user, $loginParam = [], $vpn_url = 'https://vpn.bjut.edu.cn/prx/000/http/localhost/', $base_url = 'https://vpn.bjut.edu.cn/prx/000/http/gdjwgl.bjut.edu.cn/', $request_options = [])
     {
         //Set the base_uri.
         $this->vpn_url = $vpn_url;
@@ -170,7 +170,7 @@ class Client
     public function login()
     {
         /* if(!$this->test_vpn()){
-            throw new SpiderException("未登录vpn或已经过期!");
+            throw new SpiderException('未登录vpn或已经过期!');
         } */
 
         //Get the hidden value from login page.
