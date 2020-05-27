@@ -227,7 +227,9 @@ class Client
             $n->grade_term[$k]->year = $v[0];
             $n->grade_term[$k]->term = $v[1];
             $n->grade_term[$k]->id = $v[2];
-            $n->grade_term[$k]->name = $v[3];
+            $n->grade_term[$k]->name = str_replace(
+                ['Ⅰ', 'Ⅱ',  'Ⅲ',  'Ⅳ',  'Ⅴ', 'Ⅵ', 'Ⅶ',  'Ⅷ',   'Ⅸ', 'Ⅹ', 'Ⅺ',  'Ⅻ'],
+                ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'], $v[3]);
             $n->grade_term[$k]->type = $v[4];
             $n->grade_term[$k]->belong = $v[5];
             $n->grade_term[$k]->credit = $v[6];
