@@ -7,6 +7,7 @@ use GuzzleHttp\Promise;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\FilesystemCache;
 
+use stdClass;
 use ZfSpider\Traits\Parser;
 use ZfSpider\Traits\BuildRequest;
 
@@ -412,12 +413,12 @@ class Client
     /**
      * Get the CET-4/6 result.
      *
-     * @return array
+     * @return stdClass
      */
     public function getCet()
     {
         $response = $this->get(self::ZF_CET_URI);
-        return $this->getCommonTable($response->getBody());
+        return $this->getCetTable($response->getBody());
     }
 
     /**

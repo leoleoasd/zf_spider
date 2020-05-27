@@ -11,6 +11,7 @@
 
 namespace ZfSpider\Traits;
 
+use stdClass;
 use Symfony\Component\DomCrawler\Crawler;
 
 /**
@@ -76,7 +77,7 @@ trait  Parser
      * @param string $selector
      * @return array
      */
-    public function getCommonTable($body, $selector = '#DataGrid1')
+    public function getCommonTable($body, $selector)
     {
         $crawler = new Crawler((string)$body);
 
@@ -90,6 +91,25 @@ trait  Parser
         //Unset the title.
         unset($data[0]);
         return $data;
+    }
+
+    public function getCetTable($body, $selector = '#DataGrid1') {
+        $resp = $this->getCommonTable($body, $selector)[1];
+        $ret = [];
+        for ($i = 1; $i < count($resp); $i++) {
+            $ret[0] = new stdClass();
+            $ret[0]->year = $resp[0];
+            $ret[0]->term = $resp[1];
+            $ret[0]->name = $resp[2];
+            $ret[0]->id = $resp[3];
+            $ret[0]->date = $resp[4];
+            $ret[0]->total = $resp[5];
+            $ret[0]->listening = $resp[6];
+            $ret[0]->reading = $resp[7];
+            $ret[0]->comprehensive = $resp[8];
+        }
+
+        return $ret;
     }
 
     /**
