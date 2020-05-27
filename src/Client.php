@@ -1,6 +1,7 @@
 <?php
 namespace ZfSpider;
 
+use ArrayObject;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Promise;
@@ -35,13 +36,6 @@ class Client
 
     private $main_page_uri = 'xs_main.aspx';
 
-    private $headers = [
-        'timeout' => 3.0,
-        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.94 Safari/537.36',
-        'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Content-Type' => 'application/x-www-form-urlencoded'
-    ];
-
     private $stu_id;
 
     private $password;
@@ -53,8 +47,6 @@ class Client
     //The login post param
     private $loginParam = [];
 
-    private $cookie_vpn;
-
     private $cookie;
 
     private $vpn_url;
@@ -62,7 +54,7 @@ class Client
     /**
      * @param string $username
      * @param string $password
-     * @return Client
+     * @return CookieJar
      * @throws SpiderException
      */
     public function login_vpn(string $username, string $password){
@@ -76,12 +68,12 @@ class Client
         ];
         $query = [
             'form_params' => $post,
-            'cookies' => $this->cookie_vpn,
+            'cookies' => $this->cookie,
             'allow_redirects' => false
         ];
         $result = $this->client->request('POST', $this->vpn_url.'login', $query);
         if($result->getStatusCode() == 302 and $result->getHeader("Location") == ['https://vpn.bjut.edu.cn/prx/000/http/localhost/welcome']) {
-            return $this;
+            return $this->cookie;
         }
         throw new SpiderException("VPN登录失败!");
     }
@@ -93,11 +85,11 @@ class Client
     public function test_vpn(){
         $result = $this->client->get($this->vpn_url.'welcome', [
             'allow_redirects' => false,
-            'cookies' => $this->cookie_vpn
+            'cookies' => $this->cookie
         ]);
-        if($result->getStatusCode() == 200) {
+        if( $result->getStatusCode() == 200 ) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -108,8 +100,7 @@ class Client
      * @param array $loginParam
      * @param string $vpn_url
      * @param string $base_url
-     * @param array $request_optionss
-     * @throws SpiderException
+     * @param array $request_options
      */
     function __construct($user, $loginParam = [], $vpn_url = "https://vpn.bjut.edu.cn/prx/000/http/localhost/", $base_url = "https://vpn.bjut.edu.cn/prx/000/http/gdjwgl.bjut.edu.cn/", $request_options = [])
     {
@@ -128,7 +119,7 @@ class Client
             'base_uri' => $this->base_uri
         ];
 
-        $this->cookie_vpn = new CookieJar();
+        $this->cookie = new CookieJar();
 
         //Set the login post param
         if (!empty($loginParam)) {
@@ -136,13 +127,6 @@ class Client
         }
 
         $this->client = new HttpClient($client_param);
-    }
-
-    /**
-     * @return CookieJar
-     */
-    public function getCookieJar(){
-        return $this->cookie;
     }
 
     /**
@@ -155,148 +139,17 @@ class Client
     }
 
     /**
-     * @return CookieJar
-     */
-    public function getCookieVpnJar(){
-        return $this->cookie_vpn;
-    }
-
-    /**
-     * @param CookieJar $jar
-     * @return Client
-     */
-    public function setCookieVpnJar(CookieJar $jar){
-        $this->cookie_vpn = $jar;
-        return $this;
-    }
-
-    /**
-     * Set the UserAgent.
-     *
-     * @param string $ua
-     * @return Object $this
-     */
-    public function setUa($ua)
-    {
-        $this->headers['User-Agent'] = $ua;
-        return $this;
-    }
-
-    /**
-     * Get the User-Agent value.
-     *
-     * @return string
-     */
-    public function getUa()
-    {
-        return $this->headers['User-Agent'];
-    }
-
-    /**
-     * Set the Timeout.
-     *
-     * @param float $time
-     * @return Client
-     */
-    public function setTimeOut($time)
-    {
-        if (!is_numeric($time)) {
-            //Should throw a Exception?
-            return $this;
-        }
-        $this->headers['timeout'] = $time;
-        return $this;
-    }
-
-    /**
-     * Get the Timeout.
-     *
-     * @return string
-     */
-    public function getTimeOut()
-    {
-        return $this->headers['timeout'];
-    }
-
-    /**
-     * Set the Login uri.
-     *
-     * @param string $uri
-     * @return string
-     */
-    public function setLoginUri($uri)
-    {
-        $this->login_uri = $uri;
-        return $this;
-    }
-
-    /**
-     * Get the login uri.
-     *
-     * @return string
-     */
-    public function getLoginUri()
-    {
-        return $this->login_uri;
-    }
-
-    /**
-     * Set the Referer header.
-     *
-     * @param string $referer
-     * @return string
-     */
-    public function setReferer($referer)
-    {
-        $this->headers['referer'] = $referer;
-        return $this;
-    }
-
-    /**
-     * Get the Referer header.
-     *
-     * @return string
-     */
-    public function getReferer()
-    {
-        return $this->headers['Referer'];
-    }
-
-    /**
-     * Set the main page uri, the default value is 'xs_main.aspx'
-     *
-     * @param string $uri
-     * @return Client
-     */
-    public function setMainPageUri($uri)
-    {
-        $this->main_page_uri = $uri;
-        return $this;
-    }
-
-    /**
-     * Get the main page uri, the default value is 'xs_main.aspx'
-     *
-     * @return string
-     */
-    public function getMainPageUri()
-    {
-        return $this->main_page_uri;
-    }
-
-    /**
      * Login, and get the cookie jar.
      *
      * @param void
-     * @return $this or $jar
      * @throws SpiderException
+     * @return CookieJar
      */
     public function login()
     {
-        if(!$this->test_vpn()){
+        /* if(!$this->test_vpn()){
             throw new SpiderException("未登录vpn或已经过期!");
-        }
-        $this->cookie = clone $this->cookie_vpn;
+        } */
 
         //Get the hidden value from login page.
         $loginParam = [
@@ -317,71 +170,64 @@ class Client
             'cookies' => $this->cookie,
             'allow_redirects' => false,
         ];
-        $result = $this->client->request('POST', $this->login_uri, $query);
-        $response = $this->client->get($this->main_page_uri, [
-            'allow_redirects' => false, 'query' => ['xh' => $this->stu_id],
-            'cookies' => $this->cookie,
-        ]);
+        $response = $this->client->request('POST', $this->login_uri, $query);
         switch ($response->getStatusCode()) {
-            case 200:
-                return $this;
-                break;
             case 302:
-                throw new SpiderException('Wrong password.', 1);
+                if(strstr($response->getHeader('Location')[0], 'err')) {
+                    throw new SpiderException('Wrong password.', 1003);
+                }
+                if(strstr($response->getHeader('Location')[0],'fk_main.html')) {
+                    throw new SpiderException('Wrong username.', 1002);
+                }
                 break;
             default:
-                throw new SpiderException('Maybe the data source is broken!', 1);
+                throw new SpiderException('Maybe the data source is broken!', 1001);
                 break;
         }
+        return $this->cookie;
     }
 
     /**
      * Get the grade data. This function is request all of grade.
      *
-     * @return array
+     * @return stdClass
      */
     public function getGrade()
     {
-        //Get the hidden value.
-        $response = $this->get(self::ZF_GRADE_URI, [], $this->headers);
-        $viewstate = $this->getGradeViewState($response->getBody());
-        $post['__VIEWSTATE'] = $viewstate;
-        $post['Button1'] = '%B2%E9%D1%AF%D2%D1%D0%DE%BF%CE%B3%CC%D7%EE%B8%DF%B3%C9%BC%A8';
-        $response = $this->post(self::ZF_GRADE_URI, [], $post, $this->headers);
+        $response = $this->get(self::ZF_GRADE_URI);
         $data = $this->getCommonTable($response->getBody(), '#Datagrid1');
-        $newdata = [];
-        foreach($data as $d){
-            $newdata[] = [
-                'year' => $d[0],
-                'term' => $d[1],
-                'courseId' => $d[2],
-                'courseName' => $d[3],
-                'courseType' => $d[4],
-                'courseBelong' => $d[5],
-                'courseCredit' => $d[6],
-                'gradePoint' => $d[7],
-                'score' => $d[8],
-                'minorMark' => $d[9],
-                'makeUpScore' => $d[10],
-                'retakeMark' => $d[14],
-                'retakeScore' => $d[11],
-                'academy' => $d[12],
-                'remark' => $d[13]
-            ];
+        if(is_null($data)) { return null; }
+        $n = new stdClass();
+        $n->grade_term = new ArrayObject();
+        foreach($data as $k => $v){
+            $n->grade_term[$k] = new stdClass();
+            $n->grade_term[$k]->year = $v[0];
+            $n->grade_term[$k]->term = $v[1];
+            $n->grade_term[$k]->id = $v[2];
+            $n->grade_term[$k]->name = $v[3];
+            $n->grade_term[$k]->type = $v[4];
+            $n->grade_term[$k]->belong = $v[5];
+            $n->grade_term[$k]->credit = $v[6];
+            $n->grade_term[$k]->gpa = $v[7];
+            $n->grade_term[$k]->score = $v[8];
+            $n->grade_term->grade_term[$k]->minor_maker = $v[9];
+            $n->grade_term[$k]->makeup_score = $v[10];
+            $n->grade_term[$k]->retake_maker = $v[14];
+            $n->grade_term[$k]->retake_score = $v[11];
+            $n->grade_term[$k]->academy = $v[12];
+            $n->grade_term[$k]->comment = $v[13];
         }
-        return $newdata;
+        return $n;
     }
 
     /**
      * Get the schedule data
      *
-     * @param string $term
-     * @param string $year
      * @return array
      */
     public function getSchedule()
     {
-        $response = $this->get(self::ZF_SCHEDULE_URI, [], $this->headers);
+        $response = $this->get(self::ZF_SCHEDULE_URI);
         return $this->getScheduleTable($response->getBody());
     }
 
@@ -393,20 +239,21 @@ class Client
     public function getExams()
     {
         $response = $this->get(self::ZF_EXAM_URI);
-        $data = $this->getCommonTable($response->getBody());
+        $data = $this->getCommonTable($response->getBody(), '#DataGrid1');
+        if(is_null($data)) { return null; }
         $newData = [];
-        foreach($data as $d){
-            $newData[] = [
-                'courseId'=>$d[0],
-                'courseName'=>$d[1],
-                'name'=>$d[2],
-                'dateTime'=>$d[3],
-                'classroom'=>$d[4],
-                'type'=>$d[5],
-                'seat'=>$d[6],
-                'campus' => $d[7],
-            ];
+        foreach($data as $k => $v){
+            $newData[$k] = new stdClass();
+            $newData[$k]->id = $v[0];
+            $newData[$k]->courseName = $v[1];
+            $newData[$k]->name = $v[2];
+            $newData[$k]->time = $v[3];
+            $newData[$k]->room = $v[4];
+            $newData[$k]->type = $v[5];
+            $newData[$k]->seat = $v[6];
+            $newData[$k]->campus = $v[7];
         }
+
         return $newData;
     }
 
@@ -430,5 +277,16 @@ class Client
     {
         $response = $this->get(self::ZF_SELECT_URI);
         return $this->courseSelectData($response->getBody());
+    }
+
+    /**
+     * Get the user detail.
+     *
+     * @return stdClass
+     */
+    public function getDetail()
+    {
+        $response = $this->get(self::ZF_DETAIL_URI);
+        return $this->detailData($response->getBody());
     }
 }

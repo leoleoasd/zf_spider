@@ -7,14 +7,16 @@
     "authors": [
     ],
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=7.0.0",
         "guzzlehttp/guzzle": "~6.0",
         "symfony/dom-crawler": "^3.0",
         "symfony/css-selector": "^3.0",
-        "doctrine/cache": "^1.6"
+        "doctrine/cache": "^1.6",
+        "ext-dom": "*",
+        "ext-iconv": "*"
     },
     "autoload": {
-    	"psr-4": {
+        "psr-4": {
             "ZfSpider\\": "src/"
         }
     }
