@@ -106,7 +106,6 @@ trait Parser
     public function cetData($body) {
         $resp = $this->getCommonTable($body, '#DataGrid1');
         if(is_null($resp)) { return null; }
-        var_dump($resp);
         $ret = [];
         foreach ($resp as $k => $v) {
             $ret[$k-1] = new stdClass();
