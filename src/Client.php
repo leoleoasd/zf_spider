@@ -20,6 +20,12 @@ class Client
 
     const ZF_SCHEDULE_URI = 'xskbcx.aspx';
 
+    const ZF_CET_URI = 'xsdjkscx.aspx';
+
+    const ZF_SELECT_URI = 'xsxkqk.aspx';
+
+    const ZF_DETAIL_URI = 'xsgrxx.aspx';
+
     public $client;
 
     private $base_uri;
@@ -46,6 +52,8 @@ class Client
     //The login post param
     private $loginParam = [];
 
+    private $cookie_vpn;
+
     private $cookie;
 
     private $vpn_url;
@@ -67,7 +75,7 @@ class Client
         ];
         $query = [
             'form_params' => $post,
-            'cookies' => $this->cookie,
+            'cookies' => $this->cookie_vpn,
             'allow_redirects' => false
         ];
         $result = $this->client->request('POST', $this->vpn_url.'login', $query);
@@ -84,7 +92,7 @@ class Client
     public function test_vpn(){
         $result = $this->client->get($this->vpn_url.'welcome', [
             'allow_redirects' => false,
-            'cookies' => $this->cookie
+            'cookies' => $this->cookie_vpn
         ]);
         if($result->getStatusCode() == 200) {
             return true;
@@ -119,7 +127,7 @@ class Client
             'base_uri' => $this->base_uri
         ];
 
-        $this->cookie = new CookieJar();
+        $this->cookie_vpn = new CookieJar();
 
         //Set the login post param
         if (!empty($loginParam)) {
@@ -142,7 +150,22 @@ class Client
      */
     public function setCookieJar(CookieJar $jar){
         $this->cookie = $jar;
-        $this->client;
+        return $this;
+    }
+
+    /**
+     * @return CookieJar
+     */
+    public function getCookieVpnJar(){
+        return $this->cookie_vpn;
+    }
+
+    /**
+     * @param CookieJar $jar
+     * @return Client
+     */
+    public function setCookieVpnJar(CookieJar $jar){
+        $this->cookie_vpn = $jar;
         return $this;
     }
 
@@ -272,6 +295,8 @@ class Client
         if(!$this->test_vpn()){
             throw new SpiderException("未登录vpn或已经过期!");
         }
+        $this->cookie = clone $this->cookie_vpn;
+
         //Get the hidden value from login page.
         $loginParam = [
             'stu_id' => 'TextBox1',
@@ -353,60 +378,21 @@ class Client
      * @param string $year
      * @return array
      */
-    public function getSchedule($year = null, $term = null)
+    public function getSchedule()
     {
         $response = $this->get(self::ZF_SCHEDULE_URI, [], $this->headers);
-        if($term == null or $year == null){
-            return $this->getScheduleTable($response->getBody());
-        }else{
-            $viewstate = $this->getScheduleViewState($response->getBody());
-            $response = $this->post(self::ZF_SCHEDULE_URI, [], [
-                '__VIEWSTATE' => $viewstate,
-                'xnd' => $year,
-                'xqd' => 3-(int)$term,
-            ], $this->headers);
-            $viewstate = $this->getScheduleViewState($response->getBody());
-            $response = $this->post(self::ZF_SCHEDULE_URI, [], [
-                '__VIEWSTATE' => $viewstate,
-                'xnd' => $year,
-                'xqd' => $term,
-            ], $this->headers);
-            return (array)$this->getSchedule($response->getBody());
-        }
+        return $this->getScheduleTable($response->getBody());
     }
 
     /**
      * Get the default term exam data by GET.
-     * If We need another term's data, use POST.
      *
-     * @param null|string $term
-     * @param null|string $year
      * @return array
      */
-    public function getExams($year = null, $term = null)
+    public function getExams()
     {
         $response = $this->get(self::ZF_EXAM_URI);
-        if($term == null or $year == null){
-            $data = $this->getCommonTable($response->getBody());
-        }else{
-            $viewstate = $this->getExamViewState($response->getBody());
-            $response = $this->post(self::ZF_EXAM_URI, [], [
-                '__EVENTTARGET' => "xqd",
-                '__EVENTARGUMENT' => "",
-                '__VIEWSTATE' => $viewstate,
-                'xnd' => $year,
-                'xqd' => 4-(int)$term,
-            ], $this->headers);
-            $viewstate = $this->getExamViewState($response->getBody());
-            $response = $this->post(self::ZF_EXAM_URI, [], [
-                '__EVENTTARGET' => "xqd",
-                '__EVENTARGUMENT' => "",
-                '__VIEWSTATE' => $viewstate,
-                'xnd' => $year,
-                'xqd' => $term,
-            ], $this->headers);
-            $data = $this->getCommonTable($response->getBody());
-        }
+        $data = $this->getCommonTable($response->getBody());
         $newData = [];
         foreach($data as $d){
             $newData[] = [
@@ -421,5 +407,29 @@ class Client
             ];
         }
         return $newData;
+    }
+
+    /**
+     * Get the CET-4/6 result.
+     *
+     * @return array
+     */
+    public function getCet()
+    {
+        $response = $this->get(self::ZF_CET_URI);
+        return $this->getCommonTable($response->getBody());
+    }
+
+    /**
+     * Get the course select result.
+     *
+     * @return array
+     */
+    public function getCourseSelect()
+    {
+
+        $response = $this->get(self::ZF_SELECT_URI);
+        echo $response->getBody();
+        return $response->getBody();
     }
 }
