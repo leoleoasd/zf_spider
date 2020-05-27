@@ -85,7 +85,7 @@ trait  Parser
         $cet = $crawler->children();
         $data = $cet->each(function (Crawler $node, $i) {
             return $node->children()->each(function (Crawler $node, $j) {
-                return trim($node->text()," ");
+                return trim($node->text());
             });
         });
         //Unset the title.
@@ -93,20 +93,53 @@ trait  Parser
         return $data;
     }
 
-    public function getCetTable($body, $selector = '#DataGrid1') {
-        $resp = $this->getCommonTable($body, $selector)[1];
+    public function cetData($body) {
+        $resp = $this->getCommonTable($body, '#DataGrid1');
+        var_dump($resp);
         $ret = [];
-        for ($i = 1; $i < count($resp); $i++) {
-            $ret[0] = new stdClass();
-            $ret[0]->year = $resp[0];
-            $ret[0]->term = $resp[1];
-            $ret[0]->name = $resp[2];
-            $ret[0]->id = $resp[3];
-            $ret[0]->date = $resp[4];
-            $ret[0]->total = $resp[5];
-            $ret[0]->listening = $resp[6];
-            $ret[0]->reading = $resp[7];
-            $ret[0]->comprehensive = $resp[8];
+        foreach ($resp as $k => $v) {
+            $ret[$k] = new stdClass();
+            $ret[$k]->year = $v[0];
+            $ret[$k]->term = $v[1];
+            $ret[$k]->name = $v[2];
+            $ret[$k]->id = $v[3];
+            $ret[$k]->date = $v[4];
+            $ret[$k]->total = $v[5];
+            $ret[$k]->listening = $v[6];
+            $ret[$k]->reading = $v[7];
+            $ret[$k]->comprehensive = $v[8];
+        }
+
+        return $ret;
+    }
+
+    public function courseSelectData($body) {
+        $resp = $this->getCommonTable($body, '#DBGrid');
+        $ret = [];
+        foreach ($resp as $k => $v) {
+            $ret[$k] = new stdClass();
+            $ret[$k]->courseSelectId = $v[0];
+            $ret[$k]->id = $v[1];
+            $ret[$k]->name = $v[2];
+            $ret[$k]->type = $v[3];
+            $ret[$k]->selected = $v[4] == '是';
+            $ret[$k]->instructor = str_replace(' ', '', $v[5]);
+            $ret[$k]->credit = $v[6];
+            $ret[$k]->hours = $v[7];
+            $ret[$k]->time = $v[8];
+            $ret[$k]->room = $v[9];
+            $ret[$k]->textbook = $v[10] == '1';
+            $ret[$k]->year = substr($v[0], 1, 9);
+            $ret[$k]->term = substr($v[0], 11, 1);
+            $ret[$k]->score = -1;
+            $ret[$k]->gpa = -1;
+            $ret[$k]->minor_maker = null;
+            $ret[$k]->belong = null;
+            $ret[$k]->makeup_score = null;
+            $ret[$k]->retake_score = null;
+            $ret[$k]->academy = null;
+            $ret[$k]->comment = null;
+            $ret[$k]->retake_maker = null;
         }
 
         return $ret;

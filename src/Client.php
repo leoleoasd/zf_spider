@@ -413,12 +413,12 @@ class Client
     /**
      * Get the CET-4/6 result.
      *
-     * @return stdClass
+     * @return array
      */
     public function getCet()
     {
         $response = $this->get(self::ZF_CET_URI);
-        return $this->getCetTable($response->getBody());
+        return $this->cetData($response->getBody());
     }
 
     /**
@@ -428,9 +428,7 @@ class Client
      */
     public function getCourseSelect()
     {
-
         $response = $this->get(self::ZF_SELECT_URI);
-        echo $response->getBody();
-        return $response->getBody();
+        return $this->courseSelectData($response->getBody());
     }
 }
