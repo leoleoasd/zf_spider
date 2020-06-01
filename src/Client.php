@@ -36,6 +36,14 @@ class Client
 
     private $main_page_uri = 'xs_main.aspx';
 
+	private $headers = [
+		'timeout' => 3.0,
+		'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.94 Safari/537.36',
+		'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+		'Content-Type' => 'application/x-www-form-urlencoded',
+		'referer' => 'https://vpn.bjut.edu.cn/prx/000/http/gdjwgl.bjut.edu.cn/xs_main.aspx'
+	];
+
     protected $stu_id;
     protected $password;
     protected $logged_in = false;
@@ -218,6 +226,18 @@ class Client
     public function getGrade()
     {
         $response = $this->get(self::ZF_GRADE_URI);
+        $viewState = $this->getScoreViewState($response->getBody());
+	    if ( is_null($viewState) ) {
+		    return null;
+	    }
+
+	    $response = $this->post(self::ZF_GRADE_URI, ['xh' => $this->stu_id, 'gnmkdm' => 'N121605'], [
+		    '__VIEWSTATE' => $viewState,
+		    'ddlXN' => '',
+		    'ddlXQ' => '',
+		    'Button1' => '%B2%E9%D1%AF%D2%D1%D0%DE%BF%CE%B3%CC%D7%EE%B8%DF%B3%C9%BC%A8'
+	    ]);
+
         $data = $this->getCommonTable($response->getBody(), '#Datagrid1');
         if(is_null($data)) { return null; }
         $n = new stdClass();

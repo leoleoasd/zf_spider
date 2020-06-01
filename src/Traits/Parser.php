@@ -176,6 +176,22 @@ trait Parser
         }
     }
 
+	/**
+	 * Parser the hidden value of HTML form.
+	 *
+	 * @param Object|string $body
+	 * @return string|null
+	 */
+	public function getScoreViewState($body)
+	{
+		try {
+			$crawler = new Crawler((string)$body);
+			return $crawler->filterXPath('//*[@id="Form1"]/input[1]')->attr('value');
+		} catch (Exception $e) {
+			return null;
+		}
+	}
+
     public function detailData(string $body){
         $doc = new DOMDocument();
         $http_response = iconv("gb2312","utf-8//IGNORE", $body);
