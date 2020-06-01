@@ -255,7 +255,7 @@ class Client
             $n->grade_term[$k]->credit = $v[6];
             $n->grade_term[$k]->gpa = $v[7];
             $n->grade_term[$k]->score = $v[8];
-            $n->grade_term->grade_term[$k]->minor_maker = $v[9];
+            $n->grade_term[$k]->minor_maker = $v[9];
             $n->grade_term[$k]->makeup_score = $v[10];
             $n->grade_term[$k]->retake_maker = $v[14];
             $n->grade_term[$k]->retake_score = $v[11];
