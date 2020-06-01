@@ -9,6 +9,7 @@ use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\FilesystemCache;
 
 use stdClass;
+use Symfony\Component\DomCrawler\Crawler;
 use ZfSpider\Traits\Parser;
 use ZfSpider\Traits\BuildRequest;
 
@@ -262,6 +263,15 @@ class Client
             $n->grade_term[$k-1]->academy = $v[12];
             $n->grade_term[$k-1]->comment = $v[13];
         }
+	    try {
+		    $crawler = new Crawler((string)$response->getBody());
+
+		    $n->sid = mb_substr($crawler->filter('#Label3')->text(), 3);
+		    $n->name = mb_substr($crawler->filter('#Label5')->text(), 3);
+		    $n->institute = mb_substr($crawler->filter('#Label6')->text(), 3);
+		    $n->major = $crawler->filter('#Label7')->text();
+		    $n->class = mb_substr($crawler->filter('#Label8')->text(), 4);
+	    } catch (\Exception $e) {}
         return $n;
     }
 
