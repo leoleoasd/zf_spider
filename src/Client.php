@@ -241,26 +241,26 @@ class Client
         $data = $this->getCommonTable($response->getBody(), '#Datagrid1');
         if(is_null($data)) { return null; }
         $n = new stdClass();
-        $n->grade_term = new ArrayObject();
+        $n->grade_term = [];
         foreach($data as $k => $v){
-            $n->grade_term[$k] = new stdClass();
-            $n->grade_term[$k]->year = $v[0];
-            $n->grade_term[$k]->term = $v[1];
-            $n->grade_term[$k]->id = $v[2];
-            $n->grade_term[$k]->name = str_replace(
+            $n->grade_term[$k-1] = new stdClass();
+            $n->grade_term[$k-1]->year = $v[0];
+            $n->grade_term[$k-1]->term = $v[1];
+            $n->grade_term[$k-1]->id = $v[2];
+            $n->grade_term[$k-1]->name = str_replace(
                 ['Ⅰ', 'Ⅱ',  'Ⅲ',  'Ⅳ',  'Ⅴ', 'Ⅵ', 'Ⅶ',  'Ⅷ',   'Ⅸ', 'Ⅹ', 'Ⅺ',  'Ⅻ'],
                 ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'], $v[3]);
-            $n->grade_term[$k]->type = $v[4];
-            $n->grade_term[$k]->belong = $v[5];
-            $n->grade_term[$k]->credit = $v[6];
-            $n->grade_term[$k]->gpa = $v[7];
-            $n->grade_term[$k]->score = $v[8];
-            $n->grade_term[$k]->minor_maker = $v[9];
-            $n->grade_term[$k]->makeup_score = $v[10];
-            $n->grade_term[$k]->retake_maker = $v[14];
-            $n->grade_term[$k]->retake_score = $v[11];
-            $n->grade_term[$k]->academy = $v[12];
-            $n->grade_term[$k]->comment = $v[13];
+            $n->grade_term[$k-1]->type = $v[4];
+            $n->grade_term[$k-1]->belong = $v[5];
+            $n->grade_term[$k-1]->credit = $v[6];
+            $n->grade_term[$k-1]->gpa = $v[7];
+            $n->grade_term[$k-1]->score = $v[8];
+            $n->grade_term[$k-1]->minor_maker = $v[9];
+            $n->grade_term[$k-1]->makeup_score = $v[10];
+            $n->grade_term[$k-1]->retake_maker = $v[14];
+            $n->grade_term[$k-1]->retake_score = $v[11];
+            $n->grade_term[$k-1]->academy = $v[12];
+            $n->grade_term[$k-1]->comment = $v[13];
         }
         return $n;
     }
@@ -288,15 +288,15 @@ class Client
         if(is_null($data)) { return null; }
         $newData = [];
         foreach($data as $k => $v){
-            $newData[$k] = new stdClass();
-            $newData[$k]->id = $v[0];
-            $newData[$k]->courseName = $v[1];
-            $newData[$k]->name = $v[2];
-            $newData[$k]->time = $v[3];
-            $newData[$k]->room = $v[4];
-            $newData[$k]->type = $v[5];
-            $newData[$k]->seat = $v[6];
-            $newData[$k]->campus = $v[7];
+            $newData[$k-1] = new stdClass();
+            $newData[$k-1]->id = $v[0];
+            $newData[$k-1]->courseName = $v[1];
+            $newData[$k-1]->name = $v[2];
+            $newData[$k-1]->time = $v[3];
+            $newData[$k-1]->room = $v[4];
+            $newData[$k-1]->type = $v[5];
+            $newData[$k-1]->seat = $v[6];
+            $newData[$k-1]->campus = $v[7];
         }
 
         return $newData;
