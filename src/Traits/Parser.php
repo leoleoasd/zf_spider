@@ -194,8 +194,7 @@ trait Parser
 
     public function detailData(string $body){
         $doc = new DOMDocument();
-        $http_response = iconv("gb2312","utf-8//IGNORE", $body);
-        @$doc->loadHTML(mb_convert_encoding($http_response, 'HTML-ENTITIES', 'UTF-8'));
+        @$doc->loadHTML(mb_convert_encoding($body, 'HTML-ENTITIES', 'gbk'));
         $data = [
             'xh' => 'student_id',
             'lbl_xszh' => 'student_cert_id',

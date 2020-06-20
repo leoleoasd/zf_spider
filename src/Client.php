@@ -227,7 +227,7 @@ class Client
     public function getGrade()
     {
         $response = $this->get(self::ZF_GRADE_URI);
-        $viewState = $this->getScoreViewState($response->getBody());
+        $viewState = $this->getScoreViewState(str_replace("gb2312\"","gbk\"",$response->getBody()));
 	    if ( is_null($viewState) ) {
 		    return null;
 	    }
@@ -239,7 +239,7 @@ class Client
 		    'Button1' => '%B2%E9%D1%AF%D2%D1%D0%DE%BF%CE%B3%CC%D7%EE%B8%DF%B3%C9%BC%A8'
 	    ]);
 
-        $data = $this->getCommonTable($response->getBody(), '#Datagrid1');
+        $data = $this->getCommonTable(str_replace("gb2312\"","gbk\"",$response->getBody()), '#Datagrid1');
         if(is_null($data)) { return null; }
         $n = new stdClass();
         $n->grade_term = [];
@@ -264,7 +264,7 @@ class Client
             $n->grade_term[$k-1]->comment = $v[13];
         }
 	    try {
-		    $crawler = new Crawler((string)$response->getBody());
+		    $crawler = new Crawler((string)str_replace("gb2312\"","gbk\"",$response->getBody()));
 
 		    $n->sid = mb_substr($crawler->filter('#Label3')->text(), 3);
 		    $n->name = mb_substr($crawler->filter('#Label5')->text(), 3);
@@ -283,7 +283,7 @@ class Client
     public function getSchedule()
     {
         $response = $this->get(self::ZF_SCHEDULE_URI);
-        return $this->getScheduleTable($response->getBody());
+        return $this->getScheduleTable(str_replace("gb2312\"","gbk\"",$response->getBody()));
     }
 
     /**
@@ -294,7 +294,7 @@ class Client
     public function getExams()
     {
         $response = $this->get(self::ZF_EXAM_URI);
-        $data = $this->getCommonTable($response->getBody(), '#DataGrid1');
+        $data = $this->getCommonTable(str_replace("gb2312\"","gbk\"",$response->getBody()), '#DataGrid1');
         if(is_null($data)) { return null; }
         $newData = [];
         foreach($data as $k => $v){
@@ -320,7 +320,7 @@ class Client
     public function getCet()
     {
         $response = $this->get(self::ZF_CET_URI);
-        return $this->cetData($response->getBody());
+        return $this->cetData(str_replace("gb2312\"","gbk\"",$response->getBody()));
     }
 
     /**
@@ -332,6 +332,7 @@ class Client
      */
     public function getCourseSelect($year = '', $term = '')
     {
+        // 缓存viewstate
         if ( isset($this->responses['course_select']) ) {
             $response = $this->responses['course_select'];
         } else {
@@ -342,7 +343,7 @@ class Client
             return null;
         }
 
-        $viewState = $this->getCourseSelectViewState($response->getBody());
+        $viewState = $this->getCourseSelectViewState(str_replace("gb2312\"","gbk\"",$response->getBody()));
         if ( is_null($viewState) ) {
             return null;
         }
@@ -351,7 +352,7 @@ class Client
         $ret->year = $viewState[1];
         $ret->term = $viewState[2];
         if ($year == '' || ($ret->year == $year && $ret->term == $term) ) {
-            $ret->list = $this->courseSelectData($response->getBody());
+            $ret->list = $this->courseSelectData(str_replace("gb2312\"","gbk\"",$response->getBody()));
             return $ret;
         } else if ($term == '') {
             return null;
@@ -363,10 +364,10 @@ class Client
             'ddlXN' => $year,
             'ddlXQ' => $term,
         ]);
-        $viewState = $this->getCourseSelectViewState($response->getBody());
+        $viewState = $this->getCourseSelectViewState(str_replace("gb2312\"","gbk\"",$response->getBody()));
         $ret->year = $viewState[1];
         $ret->term = $viewState[2];
-        $ret->list = $this->courseSelectData($response->getBody());
+        $ret->list = $this->courseSelectData(str_replace("gb2312\"","gbk\"",$response->getBody()));
         return $ret;
     }
 
@@ -378,6 +379,6 @@ class Client
     public function getDetail()
     {
         $response = $this->get(self::ZF_DETAIL_URI);
-        return $this->detailData($response->getBody());
+        return $this->detailData(str_replace("gb2312\"","gbk\"",$response->getBody()));
     }
 }
