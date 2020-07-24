@@ -116,8 +116,9 @@ class Client
      * @param string $vpn_url
      * @param string $base_url
      * @param array $request_options
+     * @param array $client_param
      */
-    function __construct($user, $loginParam = [], $vpn_url = 'https://vpn.bjut.edu.cn/prx/000/http/localhost/', $base_url = 'https://vpn.bjut.edu.cn/prx/000/http/gdjwgl.bjut.edu.cn/', $request_options = [])
+    function __construct($user, $loginParam = [], $vpn_url = 'https://vpn.bjut.edu.cn/prx/000/http/localhost/', $base_url = 'https://vpn.bjut.edu.cn/prx/000/http/gdjwgl.bjut.edu.cn/', $request_options = [], $client_param = [])
     {
         //Set the base_uri.
         $this->vpn_url = $vpn_url;
@@ -129,10 +130,10 @@ class Client
 
         $this->request_options = $request_options;
 
-        $client_param = [
+        $client_param = array_merge($client_param, [
             // Base URI is used with relative requests
             'base_uri' => $this->base_uri
-        ];
+        ]);
 
         $this->cookie = new CookieJar();
 
